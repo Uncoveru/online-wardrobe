@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wardrobe.backend.mapper.OrderMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_order (clothes_details, price, status, user_id, address, time)
+        VALUES (#{clothesDetails}, #{price}, #{status}, #{userId}, #{address}, #{time})
+    </insert>
+
+    <select id="findById" resultType="com.wardrobe.backend.entity.Order">
+        SELECT * FROM t_order WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultType="com.wardrobe.backend.entity.Order">
+        SELECT * FROM t_order ORDER BY id DESC
+    </select>
+
+    <select id="findByParams" resultType="com.wardrobe.backend.entity.Order">
+        SELECT o.* FROM t_order o
+        LEFT JOIN t_user u ON o.user_id = u.id
+        <where>
+            <if test="userName != null and userName != ''">
+                AND u.user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="status != null and status != ''">
+                AND o.status = #{status}
+            </if>
+        </where>
+        ORDER BY o.id DESC
+    </select>
+
+    <update id="updateStatus">
+        UPDATE t_order SET status = #{status} WHERE id = #{id}
+    </update>
+
+    <select id="findByUserId" resultType="com.wardrobe.backend.entity.Order">
+        SELECT * FROM t_order WHERE user_id = #{userId} ORDER BY id DESC
+    </select>
+
+</mapper>

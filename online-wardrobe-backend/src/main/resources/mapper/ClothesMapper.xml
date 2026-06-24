@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wardrobe.backend.mapper.ClothesMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_clothes (cloth_name, image, type_id, style, price)
+        VALUES (#{clothName}, #{image}, #{typeId}, #{style}, #{price})
+    </insert>
+
+    <update id="update">
+        UPDATE t_clothes
+        SET cloth_name = #{clothName},
+            image = #{image},
+            type_id = #{typeId},
+            style = #{style},
+            price = #{price}
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM t_clothes WHERE id = #{id}
+    </delete>
+
+    <select id="findById" resultType="com.wardrobe.backend.entity.Clothes">
+        SELECT * FROM t_clothes WHERE id = #{id}
+    </select>
+
+    <select id="findAll" resultType="com.wardrobe.backend.entity.Clothes">
+        SELECT * FROM t_clothes ORDER BY id
+    </select>
+
+    <select id="findByParams" resultType="com.wardrobe.backend.entity.Clothes">
+        SELECT * FROM t_clothes
+        <where>
+            <if test="clothName != null and clothName != ''">
+                AND cloth_name LIKE CONCAT('%', #{clothName}, '%')
+            </if>
+            <if test="style != null and style != ''">
+                AND style = #{style}
+            </if>
+            <if test="typeId != null">
+                AND type_id = #{typeId}
+            </if>
+        </where>
+        ORDER BY id
+    </select>
+
+</mapper>

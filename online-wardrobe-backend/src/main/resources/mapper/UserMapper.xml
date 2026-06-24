@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.wardrobe.backend.mapper.UserMapper">
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO t_user (user_name, password, phone, address, role, status)
+        VALUES (#{userName}, #{password}, #{phone}, #{address}, #{role}, #{status})
+    </insert>
+
+    <select id="findByUserName" resultType="com.wardrobe.backend.entity.User">
+        SELECT * FROM t_user WHERE user_name = #{userName} AND deleted = 0
+    </select>
+
+    <select id="findByPhone" resultType="com.wardrobe.backend.entity.User">
+        SELECT * FROM t_user WHERE phone = #{phone} AND deleted = 0
+    </select>
+
+    <select id="findById" resultType="com.wardrobe.backend.entity.User">
+        SELECT * FROM t_user WHERE id = #{id} AND deleted = 0
+    </select>
+
+    <select id="findAll" resultType="com.wardrobe.backend.entity.User">
+        SELECT * FROM t_user WHERE deleted = 0 ORDER BY id
+    </select>
+
+    <select id="findByParams" resultType="com.wardrobe.backend.entity.User">
+        SELECT * FROM t_user
+        <where>
+            AND deleted = 0
+            <if test="userName != null and userName != ''">
+                AND user_name LIKE CONCAT('%', #{userName}, '%')
+            </if>
+            <if test="phone != null and phone != ''">
+                AND phone LIKE CONCAT('%', #{phone}, '%')
+            </if>
+        </where>
+        ORDER BY id
+    </select>
+
+    <update id="update">
+        UPDATE t_user
+        SET user_name = #{userName},
+            password = #{password},
+            phone = #{phone},
+            address = #{address},
+            role = #{role},
+            status = #{status}
+        WHERE id = #{id}
+    </update>
+
+    <update id="deleteById">
+        UPDATE t_user SET deleted = 1 WHERE id = #{id}
+    </update>
+
+    <update id="updateProfile">
+        UPDATE t_user SET phone = #{phone}, address = #{address} WHERE id = #{id}
+    </update>
+
+    <select id="countByRole" resultType="int">
+        SELECT COUNT(*) FROM t_user WHERE role = #{role} AND deleted = 0
+    </select>
+
+    <update id="updateStatus">
+        UPDATE t_user SET status = #{status} WHERE id = #{id}
+    </update>
+
+</mapper>
