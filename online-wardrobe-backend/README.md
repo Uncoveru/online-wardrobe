@@ -98,27 +98,27 @@ CREATE DATABASE IF NOT EXISTS wardrobe CHARACTER SET utf8mb4 COLLATE utf8mb4_uni
 
 ### 用户接口 (`/api/user`)
 
-| 方法 | 路径        | 说明         | 鉴权 |
-| ---- | ----------- | ------------ | ---- |
-| POST | `/login`    | 用户登录     | 否   |
-| POST | `/register` | 用户注册     | 否   |
-| PUT  | `/password` | 修改密码     | 是   |
-| PUT  | `/profile`  | 更新个人信息 | 是   |
-| GET  | `/orders`   | 查询我的订单 | 是   |
+| 方法 | 路径                 | 说明         | 鉴权 |
+| ---- | -------------------- | ------------ | ---- |
+| POST | `/login`             | 用户登录     | 否   |
+| POST | `/register`          | 用户注册     | 否   |
+| PUT  | `/password`          | 修改密码     | 是   |
+| PUT  | `/profile`           | 更新个人信息 | 是   |
+| GET  | `/orders`            | 查询我的订单 | 是   |
 | POST | `/register-operator` | 注册运营人员 | 否   |
 
 ### 管理接口 (`/api/admin`)
 
-| 方法   | 路径          | 说明         | 鉴权   |
-| ------ | ------------- | ------------ | ------ |
-| POST   | `/login`      | 管理员登录（status≠1 拒绝）| 否     |
-| GET    | `/users`      | 查询用户列表 | 管理员 |
-| POST   | `/users`      | 添加用户     | 管理员 |
-| PUT    | `/users/{id}` | 修改用户     | 管理员 |
-| DELETE | `/users/{id}` | 删除用户     | 管理员 |
-| PUT    | `/users/{id}/approve` | 审核通过 | 管理员 |
-| PUT    | `/users/{id}/reject` | 审核拒绝 | 管理员 |
-| PUT    | `/users/{id}/undo-reject` | 撤销拒绝 | 管理员 |
+| 方法   | 路径                      | 说明                        | 鉴权   |
+| ------ | ------------------------- | --------------------------- | ------ |
+| POST   | `/login`                  | 管理员登录（status≠1 拒绝） | 否     |
+| GET    | `/users`                  | 查询用户列表                | 管理员 |
+| POST   | `/users`                  | 添加用户                    | 管理员 |
+| PUT    | `/users/{id}`             | 修改用户                    | 管理员 |
+| DELETE | `/users/{id}`             | 删除用户                    | 管理员 |
+| PUT    | `/users/{id}/approve`     | 审核通过                    | 管理员 |
+| PUT    | `/users/{id}/reject`      | 审核拒绝                    | 管理员 |
+| PUT    | `/users/{id}/undo-reject` | 撤销拒绝                    | 管理员 |
 
 ### 服装接口 (`/api/clothes`)
 
@@ -150,10 +150,10 @@ CREATE DATABASE IF NOT EXISTS wardrobe CHARACTER SET utf8mb4 COLLATE utf8mb4_uni
 
 ### 订单接口 (`/api/orders`)
 
-| 方法 | 路径                  | 说明         | 鉴权   |
-| ---- | --------------------- | ------------ | ------ |
-| GET  | `/orders`             | 订单列表     | 管理员 |
-| PUT  | `/orders/{id}/ship`   | 发货         | 管理员 |
+| 方法 | 路径                | 说明     | 鉴权   |
+| ---- | ------------------- | -------- | ------ |
+| GET  | `/orders`           | 订单列表 | 管理员 |
+| PUT  | `/orders/{id}/ship` | 发货     | 管理员 |
 
 ## 统一响应格式
 

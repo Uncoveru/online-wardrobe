@@ -25,7 +25,7 @@ const validateConfirmPassword = (_rule: any, value: string, callback: (error?: E
 }
 
 const validatePhone = (_rule: any, value: string, callback: (error?: Error) => void) => {
-  if (value && !/^1[3-9]\d{9}$/.test(value)) {
+  if (value && !/^\d{11}$/.test(value)) {
     callback(new Error('手机号格式不正确'))
   } else {
     callback()
