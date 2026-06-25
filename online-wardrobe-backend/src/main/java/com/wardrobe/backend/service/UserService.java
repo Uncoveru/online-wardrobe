@@ -30,6 +30,9 @@ public class UserService {
         if (user.getRole() == null) {
             user.setRole(2);
         }
+        if (user.getStatus() == null) {
+            user.setStatus(1);
+        }
         userMapper.insert(user);
         return user;
     }

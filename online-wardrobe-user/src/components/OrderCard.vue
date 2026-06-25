@@ -10,14 +10,23 @@ defineEmits<{
   pay: []
   confirm: []
 }>()
+
+const sizeLabel = (size: string) => size === '均码' ? '均码' : `${size}码`
 </script>
 
 <template>
   <el-card class="order-card">
     <div class="order-row">
       <div class="order-info">
-        <p>订单编号：{{ order.id }}</p>
-        <p>{{ order.clothesDetails }}</p>
+        <p class="order-id">订单编号：{{ order.id }}</p>
+        <ul v-if="order.orderItems?.length" class="order-items">
+          <li v-for="item in order.orderItems" :key="item.id">
+            {{ item.clothName }}
+            <span class="item-size">{{ sizeLabel(item.clothSize) }}</span>
+            <span class="item-meta">x{{ item.amount }}  ¥{{ item.price }}</span>
+          </li>
+        </ul>
+        <p v-else>{{ order.clothesDetails }}</p>
         <p class="order-time">{{ order.time }}</p>
       </div>
       <div class="order-status">
@@ -46,11 +55,45 @@ defineEmits<{
 .order-row {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .order-info {
   flex: 1;
+  min-width: 0;
+}
+
+.order-id {
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.order-items {
+  list-style: none;
+  margin: 0 0 8px;
+  padding: 0;
+}
+
+.order-items li {
+  padding: 4px 0;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  border-bottom: 1px dashed var(--color-border-light, #ebeef5);
+}
+
+.order-items li:last-child {
+  border-bottom: none;
+}
+
+.item-size {
+  color: var(--color-text-secondary);
+  margin-left: 4px;
+}
+
+.item-meta {
+  color: var(--color-text-muted);
+  margin-left: 8px;
+  font-size: 13px;
 }
 
 .order-time {

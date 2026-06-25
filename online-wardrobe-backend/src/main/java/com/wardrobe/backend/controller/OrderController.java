@@ -31,6 +31,11 @@ public class OrderController {
             @RequestParam(required = false) String status,
             HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.ORDERS_MANAGE);
+        Integer role = AuthUtils.getRole(request);
+        if (role == 3) {
+            Integer operatorId = AuthUtils.getUserId(request);
+            return Result.ok(orderService.getOrdersByOperatorId(operatorId));
+        }
         if (userName == null && status == null) {
             return Result.ok(orderService.getAllOrders());
         }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { Operation } from '@element-plus/icons-vue'
 import { getClothesList, searchClothes, getTypes, type ClothesInfo, type TypeInfo } from '../api'
@@ -19,11 +19,27 @@ const types = ref<TypeInfo[]>([])
 const mobileFilterOpen = ref(false)
 
 const currentPage = ref(1)
-const pageSize = 12
+
+const columnsPerRow = ref(4)
+const ROWS_PER_PAGE = 3
+
+function updateColumns() {
+  const width = window.innerWidth
+  if (width >= 1400) columnsPerRow.value = 5
+  else if (width < 769) columnsPerRow.value = 2
+  else if (width < 1025) columnsPerRow.value = 3
+  else columnsPerRow.value = 4
+}
+
+const pageSize = computed(() => columnsPerRow.value * ROWS_PER_PAGE)
+
+watch(pageSize, () => {
+  currentPage.value = 1
+})
 
 const pagedClothes = computed(() => {
-  const start = (currentPage.value - 1) * pageSize
-  return clothesList.value.slice(start, start + pageSize)
+  const start = (currentPage.value - 1) * pageSize.value
+  return clothesList.value.slice(start, start + pageSize.value)
 })
 
 const total = computed(() => clothesList.value.length)
@@ -47,11 +63,18 @@ watch([searchKeyword, activeTypeId], async () => {
 })
 
 onMounted(async () => {
+  updateColumns()
+  window.addEventListener('resize', updateColumns)
+
   const qKeyword = (route.query.keyword as string) || ''
   const qTypeId = route.query.typeId ? Number(route.query.typeId) : null
   if (qKeyword) searchKeyword.value = qKeyword
   if (qTypeId !== null) activeTypeId.value = qTypeId
   await Promise.all([fetchClothes(), fetchTypes()])
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', updateColumns)
 })
 
 async function fetchClothes() {
@@ -117,7 +140,7 @@ function getTypeName(typeId: number) {
 
       <div class="content">
         <div v-if="loading" class="skeleton-grid">
-          <el-skeleton v-for="n in 8" :key="n" animated>
+          <el-skeleton v-for="n in pageSize" :key="n" animated>
             <template #template>
               <el-skeleton-item variant="image" style="height:200px" />
               <div style="padding:14px 4px 4px">

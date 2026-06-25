@@ -35,6 +35,7 @@ const formRef = ref()
 const form = reactive({
     userName: '',
     password: '',
+    phone: '',
     role: 2,
 })
 
@@ -49,11 +50,17 @@ const roleLabel = computed(() => {
     return (role: number) => map[role] ?? '未知'
 })
 
-const rules = {
+const rules = computed(() => ({
     userName: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
     password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
+    phone: isEdit.value
+        ? []
+        : [
+            { required: true, message: '请输入手机号', trigger: 'blur' },
+            { pattern: /^\d{11}$/, message: '请输入11位手机号', trigger: 'blur' },
+        ],
     role: [{ required: true, message: '请选择角色', trigger: 'change' }],
-}
+}))
 
 onMounted(() => {
     fetchUsers()
@@ -101,6 +108,7 @@ function openAddDialog() {
     editId.value = 0
     form.userName = ''
     form.password = ''
+    form.phone = ''
     form.role = 2
     dialogVisible.value = true
 }
@@ -110,6 +118,7 @@ function openEditDialog(row: UserInfo) {
     isEdit.value = true
     editId.value = row.id
     form.userName = row.userName
+    form.phone = row.phone || ''
     form.password = ''
     form.role = row.role
     dialogVisible.value = true
@@ -131,6 +140,7 @@ async function handleSubmit() {
             await addUser({
                 userName: form.userName,
                 password: form.password,
+                phone: form.phone,
                 role: form.role,
             })
             ElMessage.success('添加成功')
@@ -251,7 +261,7 @@ const pagedData = computed(() => {
             </el-table-column>
             <el-table-column label="角色" width="140">
                 <template #default="{ row }">
-                    <el-tag :type="row.role === 1 ? 'danger' : row.role === 3 ? 'warning' : ''" size="small">
+                    <el-tag :type="row.role === 1 ? 'danger' : row.role === 3 ? 'warning' : 'info'" size="small">
                         {{ roleLabel(row.role) }}
                     </el-tag>
                 </template>
@@ -317,6 +327,9 @@ const pagedData = computed(() => {
         <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
             <el-form-item label="用户名" prop="userName">
                 <el-input v-model="form.userName" placeholder="请输入" :disabled="isEdit" />
+            </el-form-item>
+            <el-form-item label="手机号" prop="phone" :rules="rules.phone">
+                <el-input v-model="form.phone" placeholder="请输入11位手机号" :disabled="isEdit" />
             </el-form-item>
             <el-form-item v-if="!isEdit" label="密码" prop="password">
                 <el-input v-model="form.password" type="password" placeholder="请输入" show-password />

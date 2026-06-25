@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getOrders, shipOrder, type OrderInfo } from '../api'
+import { getOrders, shipOrder, type OrderInfo, type OrderItem } from '../api'
 import { ORDER_STATUS, ORDER_STATUS_LABELS } from '../constants/order'
 
 const orders = ref<OrderInfo[]>([])
@@ -104,7 +104,16 @@ async function handleShip(row: OrderInfo) {
                 <el-empty description="暂无数据" />
             </template>
             <el-table-column prop="id" label="编号" width="80" />
-            <el-table-column prop="clothesDetails" label="商品详情" min-width="200" />
+            <el-table-column label="商品详情" min-width="200">
+                <template #default="{ row }">
+                    <template v-if="row.orderItems && row.orderItems.length > 0">
+                        <div v-for="item in row.orderItems" :key="item.id" class="order-item-detail">
+                            {{ item.clothName }}{{ item.clothSize === '均码' ? '' : '码' }} ×{{ item.amount }} ¥{{ item.price }}
+                        </div>
+                    </template>
+                    <span v-else>{{ row.clothesDetails }}</span>
+                </template>
+            </el-table-column>
             <el-table-column label="收货信息" min-width="180">
                 <template #default="{ row }">{{ row.address }}</template>
             </el-table-column>
@@ -140,3 +149,11 @@ async function handleShip(row: OrderInfo) {
         />
     </el-card>
 </template>
+
+<style scoped>
+.order-item-detail {
+    padding: 2px 0;
+    font-size: 13px;
+    color: #606266;
+}
+</style>

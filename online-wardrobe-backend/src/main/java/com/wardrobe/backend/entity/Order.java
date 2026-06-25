@@ -1,6 +1,7 @@
 package com.wardrobe.backend.entity;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class Order {
     private Integer id;
@@ -10,6 +11,7 @@ public class Order {
     private Integer userId;
     private String address;
     private String time;
+    private List<OrderItem> orderItems;
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }
@@ -25,4 +27,6 @@ public class Order {
     public void setAddress(String address) { this.address = address; }
     public String getTime() { return time; }
     public void setTime(String time) { this.time = time; }
+    public List<OrderItem> getOrderItems() { return orderItems; }
+    public void setOrderItems(List<OrderItem> orderItems) { this.orderItems = orderItems; }
 }

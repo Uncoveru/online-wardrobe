@@ -34,8 +34,9 @@ async function handleLogin() {
         } else {
             ElMessage.error(res.data.message || '登录失败')
         }
-    } catch {
-        ElMessage.error('网络错误，请稍后重试')
+    } catch (err: any) {
+        const msg = err?.response?.data?.message || err?.message || '网络错误，请稍后重试'
+        ElMessage.error(msg)
     } finally {
         loading.value = false
     }

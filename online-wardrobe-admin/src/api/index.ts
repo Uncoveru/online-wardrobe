@@ -20,7 +20,9 @@ api.interceptors.response.use(
         if (error.response?.status === 401) {
             localStorage.removeItem('token')
             localStorage.removeItem('user')
-            router.push('/login').catch(() => {})
+            if (router.currentRoute.value.path !== '/login') {
+                router.push('/login').catch(() => {})
+            }
         }
         return Promise.reject(error)
     },
@@ -123,6 +125,17 @@ export function getSizes(typeId: number) {
     return api.get<ApiResult<SizeInfo[]>>('/sizes', { params: { typeId } })
 }
 
+export interface OrderItem {
+    id: number
+    orderId: number
+    clothId: number
+    clothName: string
+    clothSize: string
+    amount: number
+    price: number
+    operatorId: number
+}
+
 export interface OrderInfo {
     id: number
     clothesDetails: string
@@ -131,6 +144,7 @@ export interface OrderInfo {
     userId: number
     address: string
     time: string
+    orderItems?: OrderItem[]
 }
 
 export function getOrders(params?: { userName?: string; status?: string }) {

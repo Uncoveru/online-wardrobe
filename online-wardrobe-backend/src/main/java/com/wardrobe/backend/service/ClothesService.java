@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.wardrobe.backend.exception.BusinessException;
+import com.wardrobe.backend.exception.ForbiddenException;
 
 @Service
 public class ClothesService {
@@ -36,31 +37,36 @@ public class ClothesService {
         this.uploadPath = Paths.get(uploadDir);
     }
 
-    public List<Clothes> getClothesList() {
-        return clothesMapper.findAll();
+    public List<Clothes> getClothesList(Integer operatorId) {
+        return clothesMapper.findAll(operatorId);
     }
 
-    public List<Clothes> getClothesByParams(String clothName, String style, Integer typeId) {
-        return clothesMapper.findByParams(clothName, style, typeId);
+    public List<Clothes> getClothesByParams(String clothName, String style, Integer typeId, Integer operatorId) {
+        return clothesMapper.findByParams(clothName, style, typeId, operatorId);
     }
 
     public Clothes getClothesById(Integer id) {
         return clothesMapper.findById(id);
     }
 
-    public Clothes addClothes(Clothes clothes, MultipartFile file) {
+    public Clothes addClothes(Clothes clothes, MultipartFile file, Integer operatorId) {
         if (file != null && !file.isEmpty()) {
             String filename = saveFile(file);
             clothes.setImage(filename);
         }
+        clothes.setOperatorId(operatorId);
         clothesMapper.insert(clothes);
         return clothes;
     }
 
-    public Clothes updateClothes(Clothes clothes, MultipartFile file) {
+    public Clothes updateClothes(Clothes clothes, MultipartFile file, Integer operatorId) {
         Clothes existing = clothesMapper.findById(clothes.getId());
         if (existing == null) {
             throw new BusinessException(404, "服装不存在");
+        }
+
+        if (operatorId != null && !operatorId.equals(existing.getOperatorId())) {
+            throw new ForbiddenException("无权修改他人的服装");
         }
 
         String oldImage = existing.getImage();
@@ -85,10 +91,14 @@ public class ClothesService {
         return clothes;
     }
 
-    public void deleteClothes(Integer id) {
+    public void deleteClothes(Integer id, Integer operatorId) {
         Clothes clothes = clothesMapper.findById(id);
         if (clothes == null) {
             throw new BusinessException(404, "服装不存在");
+        }
+
+        if (operatorId != null && !operatorId.equals(clothes.getOperatorId())) {
+            throw new ForbiddenException("无权删除他人的服装");
         }
 
         clothesMapper.deleteById(id);
@@ -122,10 +132,11 @@ public class ClothesService {
             Files.createDirectories(uploadPath);
             String filename = UUID.randomUUID().toString() + ext;
             Path target = uploadPath.resolve(filename);
-            file.transferTo(target.toFile());
+            file.transferTo(target.toAbsolutePath().toFile());
             return filename;
         } catch (IOException e) {
-            throw new BusinessException(500, "文件上传失败");
+            log.error("文件上传失败: {}", e.toString());
+            throw new BusinessException(500, "文件上传失败: " + e.getMessage());
         }
     }
 }

@@ -14,5 +14,6 @@ public interface OrderMapper {
     List<Order> findByParams(@Param("userName") String userName,
                              @Param("status") String status);
     List<Order> findByUserId(@Param("userId") Integer userId);
+    List<Order> findByOperatorId(@Param("operatorId") Integer operatorId);
     void updateStatus(@Param("id") Integer id, @Param("status") String status);
 }

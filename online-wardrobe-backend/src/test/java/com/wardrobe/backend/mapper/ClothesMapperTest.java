@@ -52,7 +52,7 @@ class ClothesMapperTest {
         c2.setPrice(new BigDecimal("399.00"));
         clothesMapper.insert(c2);
 
-        List<Clothes> list = clothesMapper.findAll();
+        List<Clothes> list = clothesMapper.findAll(null);
         assertNotNull(list);
         assertTrue(list.size() >= 2);
     }
@@ -73,15 +73,15 @@ class ClothesMapperTest {
         c2.setPrice(new BigDecimal("359.00"));
         clothesMapper.insert(c2);
 
-        List<Clothes> byName = clothesMapper.findByParams("时尚", null, null);
+        List<Clothes> byName = clothesMapper.findByParams("时尚", null, null, null);
         assertEquals(1, byName.size());
         assertEquals("时尚衬衫", byName.get(0).getClothName());
 
-        List<Clothes> byStyle = clothesMapper.findByParams(null, "商务", null);
+        List<Clothes> byStyle = clothesMapper.findByParams(null, "商务", null, null);
         assertEquals(1, byStyle.size());
         assertEquals("商务衬衫", byStyle.get(0).getClothName());
 
-        List<Clothes> byType = clothesMapper.findByParams(null, null, 1);
+        List<Clothes> byType = clothesMapper.findByParams(null, null, 1, null);
         assertTrue(byType.size() >= 2);
     }
 

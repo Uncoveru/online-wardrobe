@@ -4,8 +4,8 @@
 <mapper namespace="com.wardrobe.backend.mapper.ClothesMapper">
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO t_clothes (cloth_name, image, type_id, style, price)
-        VALUES (#{clothName}, #{image}, #{typeId}, #{style}, #{price})
+        INSERT INTO t_clothes (cloth_name, image, type_id, style, price, operator_id)
+        VALUES (#{clothName}, #{image}, #{typeId}, #{style}, #{price}, #{operatorId})
     </insert>
 
     <update id="update">
@@ -27,7 +27,13 @@
     </select>
 
     <select id="findAll" resultType="com.wardrobe.backend.entity.Clothes">
-        SELECT * FROM t_clothes ORDER BY id
+        SELECT * FROM t_clothes
+        <where>
+            <if test="operatorId != null">
+                AND operator_id = #{operatorId}
+            </if>
+        </where>
+        ORDER BY id
     </select>
 
     <select id="findByParams" resultType="com.wardrobe.backend.entity.Clothes">
@@ -41,6 +47,9 @@
             </if>
             <if test="typeId != null">
                 AND type_id = #{typeId}
+            </if>
+            <if test="operatorId != null">
+                AND operator_id = #{operatorId}
             </if>
         </where>
         ORDER BY id

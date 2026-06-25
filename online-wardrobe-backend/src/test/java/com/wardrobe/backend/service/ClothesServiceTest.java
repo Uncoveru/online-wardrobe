@@ -31,9 +31,9 @@ class ClothesServiceTest {
         c.setTypeId(1);
         c.setStyle("时尚");
         c.setPrice(new BigDecimal("199.00"));
-        clothesService.addClothes(c, null);
+        clothesService.addClothes(c, null, null);
 
-        List<Clothes> list = clothesService.getClothesList();
+        List<Clothes> list = clothesService.getClothesList(null);
         assertNotNull(list);
         assertTrue(list.size() >= 1);
     }
@@ -45,9 +45,9 @@ class ClothesServiceTest {
         c1.setTypeId(1);
         c1.setStyle("时尚");
         c1.setPrice(new BigDecimal("299.00"));
-        clothesService.addClothes(c1, null);
+        clothesService.addClothes(c1, null, null);
 
-        List<Clothes> result = clothesService.getClothesByParams("红色", null, null);
+        List<Clothes> result = clothesService.getClothesByParams("红色", null, null, null);
         assertEquals(1, result.size());
         assertEquals("红色裙子", result.get(0).getClothName());
     }
@@ -64,7 +64,7 @@ class ClothesServiceTest {
                 "file", "test.png", "image/png", "test image".getBytes()
         );
 
-        Clothes saved = clothesService.addClothes(c, file);
+        Clothes saved = clothesService.addClothes(c, file, null);
 
         assertNotNull(saved.getId());
         assertNotNull(saved.getImage());
@@ -78,7 +78,7 @@ class ClothesServiceTest {
         c.setTypeId(1);
         c.setStyle("休闲");
         c.setPrice(new BigDecimal("100.00"));
-        clothesService.addClothes(c, null);
+        clothesService.addClothes(c, null, null);
 
         c.setClothName("更新名称");
         c.setPrice(new BigDecimal("150.00"));
@@ -96,7 +96,7 @@ class ClothesServiceTest {
         c.setTypeId(1);
         c.setStyle("休闲");
         c.setPrice(new BigDecimal("50.00"));
-        clothesService.addClothes(c, null);
+        clothesService.addClothes(c, null, null);
 
         clothesService.deleteClothes(c.getId());
 

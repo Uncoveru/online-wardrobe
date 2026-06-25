@@ -41,7 +41,7 @@ public class ClothesDataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        List<Clothes> existing = clothesMapper.findAll();
+        List<Clothes> existing = clothesMapper.findAll(null);
         if (existing != null && !existing.isEmpty()) {
             return;
         }

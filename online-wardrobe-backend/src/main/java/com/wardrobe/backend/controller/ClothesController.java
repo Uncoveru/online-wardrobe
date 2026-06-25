@@ -32,8 +32,9 @@ public class ClothesController {
     }
 
     @GetMapping("/clothes")
-    public Result<List<Clothes>> listClothes() {
-        return Result.ok(clothesService.getClothesList());
+    public Result<List<Clothes>> listClothes(HttpServletRequest request) {
+        Integer operatorId = getOperatorIdForFilter(request);
+        return Result.ok(clothesService.getClothesList(operatorId));
     }
 
     @GetMapping("/clothes/{id}")
@@ -49,8 +50,10 @@ public class ClothesController {
     public Result<List<Clothes>> searchClothes(
             @RequestParam(required = false) String clothName,
             @RequestParam(required = false) String style,
-            @RequestParam(required = false) Integer typeId) {
-        return Result.ok(clothesService.getClothesByParams(clothName, style, typeId));
+            @RequestParam(required = false) Integer typeId,
+            HttpServletRequest request) {
+        Integer operatorId = getOperatorIdForFilter(request);
+        return Result.ok(clothesService.getClothesByParams(clothName, style, typeId, operatorId));
     }
 
     @PostMapping("/clothes")
@@ -62,12 +65,13 @@ public class ClothesController {
             @RequestParam(required = false) MultipartFile file,
             HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.CLOTHES_MANAGE);
+        Integer operatorId = AuthUtils.getUserId(request);
         Clothes clothes = new Clothes();
         clothes.setClothName(clothName);
         clothes.setTypeId(typeId);
         clothes.setStyle(style);
         clothes.setPrice(price);
-        Clothes saved = clothesService.addClothes(clothes, file);
+        Clothes saved = clothesService.addClothes(clothes, file, operatorId);
         return Result.ok(saved);
     }
 
@@ -81,20 +85,22 @@ public class ClothesController {
             @RequestParam(required = false) MultipartFile file,
             HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.CLOTHES_MANAGE);
+        Integer operatorId = getOperatorIdForFilter(request);
         Clothes clothes = new Clothes();
         clothes.setId(id);
         clothes.setClothName(clothName);
         clothes.setTypeId(typeId);
         clothes.setStyle(style);
         clothes.setPrice(price);
-        Clothes updated = clothesService.updateClothes(clothes, file);
+        Clothes updated = clothesService.updateClothes(clothes, file, operatorId);
         return Result.ok(updated);
     }
 
     @DeleteMapping("/clothes/{id}")
     public Result<Void> deleteClothes(@PathVariable Integer id, HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.CLOTHES_MANAGE);
-        clothesService.deleteClothes(id);
+        Integer operatorId = getOperatorIdForFilter(request);
+        clothesService.deleteClothes(id, operatorId);
         return Result.ok();
     }
 
@@ -106,6 +112,15 @@ public class ClothesController {
     @GetMapping("/sizes")
     public Result<List<Size>> listSizes(@RequestParam Integer typeId) {
         return Result.ok(sizeMapper.findByTypeId(typeId));
+    }
+
+    private Integer getOperatorIdForFilter(HttpServletRequest request) {
+        Integer role = (Integer) request.getAttribute("role");
+        if (role == null || role == 1 || role == 2) {
+            return null;
+        }
+        Integer userId = (Integer) request.getAttribute("userId");
+        return userId;
     }
 
     private void requirePermission(HttpServletRequest request, String permission) {

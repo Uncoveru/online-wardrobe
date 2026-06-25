@@ -263,10 +263,11 @@ function getTypeName(typeId: number) {
                     :auto-upload="false"
                     list-type="picture"
                     :limit="1"
+                    accept="image/jpeg,image/png,image/gif,image/webp"
                 >
                     <el-button type="primary">选择图片</el-button>
                     <template #tip>
-                        <div class="el-upload__tip">支持 jpg/png 格式，不选择则保留原图</div>
+                        <div class="el-upload__tip">支持 jpg/png/gif/webp 格式，不选择则保留原图</div>
                     </template>
                 </el-upload>
             </el-form-item>
@@ -285,5 +286,12 @@ function getTypeName(typeId: number) {
 .toolbar {
     display: flex;
     justify-content: flex-end;
+}
+
+:deep(.el-upload-list__item-name) {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 280px;
 }
 </style>

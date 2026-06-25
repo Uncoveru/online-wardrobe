@@ -122,10 +122,15 @@ async function handleCheckout() {
       <el-card>
         <el-table ref="tableRef" :data="cartItems" class="cart-table" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="50" :selectable="(row: CartInfo) => !!row.clothName" />
-          <el-table-column label="商品" min-width="200">
+          <el-table-column label="商品" min-width="180">
             <template #default="{ row }">
-              <span v-if="row.clothName">{{ row.clothName }} {{ row.clothSize }}码</span>
+              <span v-if="row.clothName">{{ row.clothName }}</span>
               <span v-else class="offline">商品已下架（服装编号{{ row.clothId }}）</span>
+            </template>
+          </el-table-column>
+          <el-table-column label="尺码" width="100">
+            <template #default="{ row }">
+              <span>{{ row.clothSize === '均码' ? '均码' : `${row.clothSize || '--'}码` }}</span>
             </template>
           </el-table-column>
           <el-table-column label="单价" width="100">

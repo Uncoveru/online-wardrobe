@@ -3,12 +3,14 @@ package com.wardrobe.backend.service;
 import com.wardrobe.backend.entity.Cart;
 import com.wardrobe.backend.entity.Clothes;
 import com.wardrobe.backend.entity.Order;
+import com.wardrobe.backend.entity.OrderItem;
 import com.wardrobe.backend.entity.User;
 import com.wardrobe.backend.enums.OrderStatus;
 import com.wardrobe.backend.exception.BusinessException;
 import com.wardrobe.backend.exception.ForbiddenException;
 import com.wardrobe.backend.mapper.CartMapper;
 import com.wardrobe.backend.mapper.ClothesMapper;
+import com.wardrobe.backend.mapper.OrderItemMapper;
 import com.wardrobe.backend.mapper.OrderMapper;
 import com.wardrobe.backend.mapper.UserMapper;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -25,12 +28,15 @@ public class CartService {
     private final CartMapper cartMapper;
     private final ClothesMapper clothesMapper;
     private final OrderMapper orderMapper;
+    private final OrderItemMapper orderItemMapper;
     private final UserMapper userMapper;
 
-    public CartService(CartMapper cartMapper, ClothesMapper clothesMapper, OrderMapper orderMapper, UserMapper userMapper) {
+    public CartService(CartMapper cartMapper, ClothesMapper clothesMapper, OrderMapper orderMapper,
+                       OrderItemMapper orderItemMapper, UserMapper userMapper) {
         this.cartMapper = cartMapper;
         this.clothesMapper = clothesMapper;
         this.orderMapper = orderMapper;
+        this.orderItemMapper = orderItemMapper;
         this.userMapper = userMapper;
     }
 
@@ -52,15 +58,26 @@ public class CartService {
 
         StringBuilder details = new StringBuilder();
         BigDecimal total = BigDecimal.ZERO;
+        List<OrderItem> orderItems = new ArrayList<>();
         for (Cart item : items) {
             Clothes c = clothesMapper.findById(item.getClothId());
             if (c == null) {
                 throw new BusinessException(400, "商品 [" + item.getClothId() + "] 已下架，请先移除后再结算");
             }
+            String sizeLabel = "均码".equals(item.getClothSize()) ? "" : "码";
             details.append("服装编号").append(c.getId()).append(", ")
-                    .append(c.getClothName()).append(item.getClothSize()).append("码 (")
+                    .append(c.getClothName()).append(item.getClothSize()).append(sizeLabel).append(" (")
                     .append(c.getPrice()).append(") x").append(item.getAmount()).append("; ");
             total = total.add(c.getPrice().multiply(BigDecimal.valueOf(item.getAmount())));
+
+            OrderItem oi = new OrderItem();
+            oi.setClothId(c.getId());
+            oi.setClothName(c.getClothName());
+            oi.setClothSize(item.getClothSize());
+            oi.setAmount(item.getAmount());
+            oi.setPrice(c.getPrice());
+            oi.setOperatorId(c.getOperatorId() != null ? c.getOperatorId() : 0);
+            orderItems.add(oi);
         }
 
         Order order = new Order();
@@ -71,6 +88,14 @@ public class CartService {
         order.setAddress(address);
         order.setTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         orderMapper.insert(order);
+
+        for (OrderItem oi : orderItems) {
+            oi.setOrderId(order.getId());
+        }
+        if (!orderItems.isEmpty()) {
+            orderItemMapper.insertBatch(orderItems);
+        }
+
         cartMapper.deleteByIds(ids);
 
         return order;

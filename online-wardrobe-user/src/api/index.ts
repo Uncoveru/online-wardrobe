@@ -73,6 +73,17 @@ export interface CartInfo {
     price: number
 }
 
+export interface OrderItemInfo {
+    id: number
+    orderId: number
+    clothId: number
+    clothName: string
+    clothSize: string
+    amount: number
+    price: number
+    operatorId: number
+}
+
 export interface OrderInfo {
     id: number
     clothesDetails: string
@@ -81,6 +92,7 @@ export interface OrderInfo {
     userId: number
     address: string
     time: string
+    orderItems?: OrderItemInfo[]
 }
 
 export async function login(account: string, password: string) {

@@ -49,10 +49,6 @@ public class JwtConfig implements WebMvcConfigurer {
                     if (path.equals(authPath)) return true;
                 }
 
-                boolean isPublicGet = "GET".equals(method) && isPublicGetPath(path);
-
-                if (isPublicGet) return true;
-
                 String authHeader = request.getHeader("Authorization");
                 if (authHeader != null && authHeader.startsWith("Bearer ")) {
                     String token = authHeader.substring(7);
@@ -61,21 +57,28 @@ public class JwtConfig implements WebMvcConfigurer {
                         request.setAttribute("userId", jwtUtils().getUserId(token));
                         request.setAttribute("userName", jwtUtils().getUserName(token));
                         request.setAttribute("role", role);
-
-                        for (String adminPath : ADMIN_PATHS) {
-                            if (path.startsWith(adminPath)) {
-                                if (!RolePermission.fromId(role).isAdmin()) {
-                                    response.setStatus(403);
-                                    return false;
-                                }
-                                break;
-                            }
-                        }
-                        return true;
                     }
                 }
-                response.setStatus(401);
-                return false;
+
+                boolean isPublicGet = "GET".equals(method) && isPublicGetPath(path);
+                if (isPublicGet) return true;
+
+                if (request.getAttribute("userId") == null) {
+                    response.setStatus(401);
+                    return false;
+                }
+
+                Integer role = (Integer) request.getAttribute("role");
+                for (String adminPath : ADMIN_PATHS) {
+                    if (path.startsWith(adminPath)) {
+                        if (!RolePermission.fromId(role).isAdmin()) {
+                            response.setStatus(403);
+                            return false;
+                        }
+                        break;
+                    }
+                }
+                return true;
             }
 
             private boolean isPublicGetPath(String path) {

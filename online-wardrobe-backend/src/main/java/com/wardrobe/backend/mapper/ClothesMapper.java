@@ -12,8 +12,9 @@ public interface ClothesMapper {
     void update(Clothes clothes);
     void deleteById(Integer id);
     Clothes findById(Integer id);
-    List<Clothes> findAll();
+    List<Clothes> findAll(@Param("operatorId") Integer operatorId);
     List<Clothes> findByParams(@Param("clothName") String clothName,
                                @Param("style") String style,
-                               @Param("typeId") Integer typeId);
+                               @Param("typeId") Integer typeId,
+                               @Param("operatorId") Integer operatorId);
 }

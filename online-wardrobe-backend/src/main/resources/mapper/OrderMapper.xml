@@ -38,4 +38,11 @@
         SELECT * FROM t_order WHERE user_id = #{userId} ORDER BY id DESC
     </select>
 
+    <select id="findByOperatorId" resultType="com.wardrobe.backend.entity.Order">
+        SELECT DISTINCT o.* FROM t_order o
+        JOIN t_order_item oi ON o.id = oi.order_id
+        WHERE oi.operator_id = #{operatorId}
+        ORDER BY o.id DESC
+    </select>
+
 </mapper>
