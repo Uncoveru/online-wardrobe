@@ -1,14 +1,18 @@
 package com.wardrobe.backend.entity;
 
+/**
+ * 用户实体
+ */
 public class User {
-    private Integer id;
-    private String userName;
-    private String password;
-    private String phone;
-    private String address;
-    private Integer role;
-    private Integer status;
-    private Integer deleted;
+
+    private Integer id;        // 主键
+    private String userName;   // 用户名
+    private String password;   // 密码（BCrypt 加密存储）
+    private String phone;      // 手机号
+    private String address;    // 地址
+    private Integer role;      // 角色（1=超级管理员, 2=普通用户, 3=操作员）
+    private Integer status;    // 状态（0=待审核, 1=正常, 2=审核拒绝）
+    private Integer deleted;   // 软删除标记
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }

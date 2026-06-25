@@ -1,3 +1,4 @@
+<!-- 服装管理：搜索 / 上架 / 编辑 / 删除 + 分页 -->
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -21,19 +22,23 @@ const currentPage = ref(1)
 const pageSize = 10
 const imageBaseUrl = import.meta.env.VITE_IMAGE_BASE_URL || 'http://localhost:8080/images'
 
+// 前端分页
 const pagedData = computed(() => {
     const start = (currentPage.value - 1) * pageSize
     return clothesList.value.slice(start, start + pageSize)
 })
 
+// 风格预设选项
 const styleOptions = ['时尚', '休闲', '商务', '运动', '正式', '复古', '户外']
 
+// 搜索表单
 const searchForm = reactive({
     clothName: '',
     style: '',
     typeId: undefined as number | undefined,
 })
 
+// 新增/编辑弹窗状态
 const dialogVisible = ref(false)
 const dialogTitle = ref('上架服装')
 const isEdit = ref(false)
@@ -49,6 +54,7 @@ const form = reactive({
     price: undefined as number | undefined,
 })
 
+// 表单校验规则
 const rules = {
     clothName: [{ required: true, message: '请输入服装名称', trigger: 'blur' }],
     typeId: [{ required: true, message: '请选择服装类别', trigger: 'change' }],
@@ -61,6 +67,7 @@ onMounted(() => {
     fetchTypes()
 })
 
+// 获取商品列表
 async function fetchClothes() {
     loading.value = true
     try {
@@ -71,11 +78,13 @@ async function fetchClothes() {
     }
 }
 
+// 获取商品类型
 async function fetchTypes() {
     const res = await getTypes()
     types.value = res.data.data || []
 }
 
+// 搜索
 async function handleSearch() {
     currentPage.value = 1
     loading.value = true
@@ -91,6 +100,7 @@ async function handleSearch() {
     }
 }
 
+// 重置搜索
 function handleReset() {
     searchForm.clothName = ''
     searchForm.style = ''
@@ -99,6 +109,7 @@ function handleReset() {
     fetchClothes()
 }
 
+// 打开新增弹窗
 function openAddDialog() {
     dialogTitle.value = '上架服装'
     isEdit.value = false
@@ -111,6 +122,7 @@ function openAddDialog() {
     dialogVisible.value = true
 }
 
+// 打开编辑弹窗
 function openEditDialog(row: ClothesInfo) {
     dialogTitle.value = '修改服装'
     isEdit.value = true
@@ -123,6 +135,7 @@ function openEditDialog(row: ClothesInfo) {
     dialogVisible.value = true
 }
 
+// 提交新增/编辑
 async function handleSubmit() {
     const valid = await formRef.value?.validate().catch(() => false)
     if (!valid) return
@@ -154,6 +167,7 @@ async function handleSubmit() {
     }
 }
 
+// 删除商品
 async function handleDelete(row: ClothesInfo) {
     try {
         await deleteClothes(row.id)
@@ -165,12 +179,14 @@ async function handleDelete(row: ClothesInfo) {
     }
 }
 
+// 根据 typeId 获取类型名称
 function getTypeName(typeId: number) {
     return types.value.find(t => t.id === typeId)?.typeName || ''
 }
 </script>
 
 <template>
+    <!-- 搜索栏 -->
     <el-card>
         <el-form :inline="true" :model="searchForm" @submit.prevent="handleSearch">
             <el-form-item label="服装名称">
@@ -193,6 +209,7 @@ function getTypeName(typeId: number) {
         </el-form>
     </el-card>
 
+    <!-- 商品表格 -->
     <el-card style="margin-top:16px">
         <div class="toolbar">
             <el-button type="primary" @click="openAddDialog">上架服装</el-button>
@@ -242,6 +259,7 @@ function getTypeName(typeId: number) {
         />
     </el-card>
 
+    <!-- 新增/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close>
         <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
             <el-form-item label="服装名称" prop="clothName">

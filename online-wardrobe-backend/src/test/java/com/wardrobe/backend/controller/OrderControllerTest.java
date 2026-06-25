@@ -45,6 +45,7 @@ class OrderControllerTest {
         user.setUserName("orderadmin");
         user.setPassword(passwordEncoder.encode("testp1"));
         user.setRole(1);
+        user.setStatus(1);
         userMapper.insert(user);
         testUserId = user.getId();
 

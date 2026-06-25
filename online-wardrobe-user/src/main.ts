@@ -1,3 +1,6 @@
+/**
+ * 入口：挂载 Vue 实例 + 注册 Pinia / Router / Element Plus
+ */
 import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'

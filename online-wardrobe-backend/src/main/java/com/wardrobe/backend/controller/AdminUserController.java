@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+/**
+ * 管理员用户管理：列表 / 新增 / 编辑 / 删除 / 审核
+ */
 @RestController
 @RequestMapping("/api/admin/users")
 public class AdminUserController {
@@ -21,6 +24,7 @@ public class AdminUserController {
         this.userService = userService;
     }
 
+    // 用户列表（支持按用户名/手机号搜索）
     @GetMapping
     public Result<List<User>> listUsers(
             @RequestParam(required = false) String userName,
@@ -34,6 +38,7 @@ public class AdminUserController {
         return Result.ok(users);
     }
 
+    // 管理员新增用户
     @PostMapping
     public Result<User> addUser(@RequestBody User user, HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.USERS_MANAGE);
@@ -41,6 +46,7 @@ public class AdminUserController {
         return Result.ok(saved);
     }
 
+    // 编辑用户信息
     @PutMapping("/{id}")
     public Result<User> updateUser(@PathVariable Integer id, @RequestBody User user,
                                    HttpServletRequest request) {
@@ -51,6 +57,7 @@ public class AdminUserController {
         return Result.ok(updated);
     }
 
+    // 删除用户（不能删除自己）
     @DeleteMapping("/{id}")
     public Result<Void> deleteUser(@PathVariable Integer id, HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.USERS_MANAGE);
@@ -62,6 +69,7 @@ public class AdminUserController {
         return Result.ok();
     }
 
+    // 审核通过
     @PutMapping("/{id}/approve")
     public Result<Void> approveUser(@PathVariable Integer id, HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.USERS_MANAGE);
@@ -69,6 +77,7 @@ public class AdminUserController {
         return Result.ok();
     }
 
+    // 审核拒绝
     @PutMapping("/{id}/reject")
     public Result<Void> rejectUser(@PathVariable Integer id, HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.USERS_MANAGE);
@@ -76,6 +85,7 @@ public class AdminUserController {
         return Result.ok();
     }
 
+    // 撤销拒绝（恢复为通过状态）
     @PutMapping("/{id}/undo-reject")
     public Result<Void> undoRejectUser(@PathVariable Integer id, HttpServletRequest request) {
         requirePermission(request, RolePermission.Permission.USERS_MANAGE);
@@ -83,6 +93,7 @@ public class AdminUserController {
         return Result.ok();
     }
 
+    // 权限校验：当前请求角色是否拥有指定权限
     private void requirePermission(HttpServletRequest request, String permission) {
         Integer role = AuthUtils.getRole(request);
         if (!RolePermission.fromId(role).hasPermission(permission)) {

@@ -1,14 +1,15 @@
+<!-- 商品卡片：图片 + 名称 + 分类 · 风格 + 价格 -->
 <script setup lang="ts">
 import { getImageUrl } from '../utils/image'
 import type { ClothesInfo } from '../api'
 
 defineProps<{
   product: ClothesInfo
-  typeName: string
+  typeName: string    // 所属类型名称
 }>()
 
 defineEmits<{
-  click: []
+  click: []           // 点击跳转详情
 }>()
 </script>
 

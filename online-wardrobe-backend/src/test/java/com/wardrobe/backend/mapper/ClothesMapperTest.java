@@ -69,7 +69,7 @@ class ClothesMapperTest {
         Clothes c2 = new Clothes();
         c2.setClothName("商务衬衫");
         c2.setTypeId(1);
-        c2.setStyle("商务");
+        c2.setStyle("商务测试专用");
         c2.setPrice(new BigDecimal("359.00"));
         clothesMapper.insert(c2);
 
@@ -77,7 +77,7 @@ class ClothesMapperTest {
         assertEquals(1, byName.size());
         assertEquals("时尚衬衫", byName.get(0).getClothName());
 
-        List<Clothes> byStyle = clothesMapper.findByParams(null, "商务", null, null);
+        List<Clothes> byStyle = clothesMapper.findByParams(null, "商务测试专用", null, null);
         assertEquals(1, byStyle.size());
         assertEquals("商务衬衫", byStyle.get(0).getClothName());
 

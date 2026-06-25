@@ -1,3 +1,4 @@
+<!-- 后台管理布局：顶部栏 + 左侧菜单 + 内容区 -->
 <script setup lang="ts">
 import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -7,6 +8,7 @@ const router = useRouter()
 const route = useRoute()
 const auth = useAuthStore()
 
+// 退出登录
 function handleLogout() {
     auth.logout()
     router.push('/login')
@@ -30,6 +32,7 @@ function handleLogout() {
             </div>
         </el-header>
         <el-container>
+            <!-- 左侧导航菜单 -->
             <el-aside width="200px" class="admin-aside">
                 <el-menu :default-active="route.path" router>
                     <el-menu-item index="/dashboard">
@@ -44,12 +47,14 @@ function handleLogout() {
                         <el-icon><Document /></el-icon>
                         <span>订单管理</span>
                     </el-menu-item>
+                    <!-- 仅超管可见 -->
                     <el-menu-item v-if="auth.user?.role === 1" index="/users">
                         <el-icon><User /></el-icon>
                         <span>用户管理</span>
                     </el-menu-item>
                 </el-menu>
             </el-aside>
+            <!-- 主内容区 -->
             <el-main class="admin-main">
                 <router-view />
             </el-main>

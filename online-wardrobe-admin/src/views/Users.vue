@@ -1,3 +1,4 @@
+<!-- 用户管理：搜索 / 新增 / 编辑 / 删除 / 审核 + 分页 -->
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed, watch } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -6,6 +7,7 @@ import { getUsers, addUser, updateUser, deleteUser, approveUser, rejectUser, und
 
 const auth = useAuthStore()
 
+// 手机号脱敏
 function maskPhone(phone?: string) {
     if (!phone || phone.length < 7) return phone || '-'
     return phone.slice(0, 3) + '****' + phone.slice(7)
@@ -19,12 +21,14 @@ const approveLoading = ref<Set<number>>(new Set())
 const currentPage = ref(1)
 const pageSize = 10
 
+// 搜索表单（包含前端状态筛选）
 const searchForm = reactive({
     userName: '',
     phone: '',
     status: null as number | null,
 })
 
+// 新增/编辑弹窗
 const dialogVisible = ref(false)
 const dialogTitle = ref('添加用户')
 const isEdit = ref(false)
@@ -36,20 +40,23 @@ const form = reactive({
     userName: '',
     password: '',
     phone: '',
-    role: 2,
+    role: 2,  // 默认普通用户
 })
 
+// 角色选项
 const roleOptions = [
     { label: '超级管理员', value: 1 },
     { label: '普通用户', value: 2 },
     { label: '运营人员', value: 3 },
 ]
 
+// 角色 ID → 名称
 const roleLabel = computed(() => {
     const map: Record<number, string> = { 1: '超级管理员', 2: '普通用户', 3: '运营人员' }
     return (role: number) => map[role] ?? '未知'
 })
 
+// 表单校验（编辑时手机号非必填）
 const rules = computed(() => ({
     userName: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
     password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
@@ -66,10 +73,12 @@ onMounted(() => {
     fetchUsers()
 })
 
+// 状态筛选变化时重置页码
 watch(() => searchForm.status, () => {
     currentPage.value = 1
 })
 
+// 获取用户列表（后端按 userName/phone 搜索）
 async function fetchUsers() {
     loading.value = true
     try {
@@ -80,6 +89,7 @@ async function fetchUsers() {
     }
 }
 
+// 搜索
 async function handleSearch() {
     currentPage.value = 1
     loading.value = true
@@ -94,6 +104,7 @@ async function handleSearch() {
     }
 }
 
+// 重置
 function handleReset() {
     searchForm.userName = ''
     searchForm.phone = ''
@@ -102,6 +113,7 @@ function handleReset() {
     fetchUsers()
 }
 
+// 打开新增弹窗
 function openAddDialog() {
     dialogTitle.value = '添加用户'
     isEdit.value = false
@@ -113,6 +125,7 @@ function openAddDialog() {
     dialogVisible.value = true
 }
 
+// 打开编辑弹窗
 function openEditDialog(row: UserInfo) {
     dialogTitle.value = '编辑用户'
     isEdit.value = true
@@ -124,6 +137,7 @@ function openEditDialog(row: UserInfo) {
     dialogVisible.value = true
 }
 
+// 提交新增/编辑
 async function handleSubmit() {
     const valid = await formRef.value?.validate().catch(() => false)
     if (!valid) return
@@ -155,6 +169,7 @@ async function handleSubmit() {
     }
 }
 
+// 删除
 async function handleDelete(row: UserInfo) {
     deletingIds.value.add(row.id)
     try {
@@ -169,6 +184,7 @@ async function handleDelete(row: UserInfo) {
     }
 }
 
+// 审核通过
 async function handleApprove(row: UserInfo) {
     approveLoading.value.add(row.id)
     try {
@@ -183,6 +199,7 @@ async function handleApprove(row: UserInfo) {
     }
 }
 
+// 审核拒绝
 async function handleReject(row: UserInfo) {
     approveLoading.value.add(row.id)
     try {
@@ -197,6 +214,7 @@ async function handleReject(row: UserInfo) {
     }
 }
 
+// 撤销拒绝
 async function handleUndoReject(row: UserInfo) {
     approveLoading.value.add(row.id)
     try {
@@ -211,6 +229,7 @@ async function handleUndoReject(row: UserInfo) {
     }
 }
 
+// 前端状态筛选 + 分页
 const filteredUsers = computed(() => {
     if (searchForm.status === null || searchForm.status === undefined) return users.value
     return users.value.filter(u => u.status === searchForm.status)
@@ -223,6 +242,7 @@ const pagedData = computed(() => {
 </script>
 
 <template>
+    <!-- 搜索栏 -->
     <el-card>
         <el-form :inline="true" :model="searchForm" @submit.prevent="handleSearch">
             <el-form-item label="用户名">
@@ -246,6 +266,7 @@ const pagedData = computed(() => {
         </el-form>
     </el-card>
 
+    <!-- 用户表格 -->
     <el-card style="margin-top:16px">
         <div class="toolbar">
             <el-button type="primary" @click="openAddDialog">添加用户</el-button>
@@ -266,6 +287,7 @@ const pagedData = computed(() => {
                     </el-tag>
                 </template>
             </el-table-column>
+            <!-- 状态列：0=待审核, 1=已通过, 2=已拒绝 -->
             <el-table-column label="状态" width="100">
                 <template #default="{ row }">
                     <el-tag
@@ -278,6 +300,7 @@ const pagedData = computed(() => {
             </el-table-column>
             <el-table-column label="操作" width="200" fixed="right">
                 <template #default="{ row }">
+                    <!-- 待审核：通过/拒绝 -->
                     <template v-if="row.status === 0">
                         <el-popconfirm title="确定通过该运营人员的注册申请吗？" @confirm="handleApprove(row)">
                             <template #reference>
@@ -290,6 +313,7 @@ const pagedData = computed(() => {
                             </template>
                         </el-popconfirm>
                     </template>
+                    <!-- 已拒绝：撤销拒绝/删除 -->
                     <template v-else-if="row.status === 2">
                         <el-popconfirm title="确定撤销拒绝该用户吗？" @confirm="handleUndoReject(row)">
                             <template #reference>
@@ -302,6 +326,7 @@ const pagedData = computed(() => {
                             </template>
                         </el-popconfirm>
                     </template>
+                    <!-- 已通过：编辑/删除（不可操作自己） -->
                     <template v-else>
                         <el-button type="primary" link @click="openEditDialog(row)" :disabled="row.id === auth.user?.id">编辑</el-button>
                         <el-popconfirm title="确定删除该用户吗？" @confirm="handleDelete(row)">
@@ -323,6 +348,7 @@ const pagedData = computed(() => {
         />
     </el-card>
 
+    <!-- 新增/编辑弹窗 -->
     <el-dialog v-model="dialogVisible" :title="dialogTitle" width="500px" destroy-on-close>
         <el-form ref="formRef" :model="form" :rules="rules" label-width="80px">
             <el-form-item label="用户名" prop="userName">
@@ -339,6 +365,7 @@ const pagedData = computed(() => {
                     <el-option v-for="opt in roleOptions" :key="opt.value" :label="opt.label" :value="opt.value" />
                 </el-select>
             </el-form-item>
+            <!-- 编辑时密码可选填 -->
             <el-form-item v-if="isEdit" label="新密码">
                 <el-input v-model="form.password" type="password" placeholder="留空则不修改密码" show-password />
             </el-form-item>

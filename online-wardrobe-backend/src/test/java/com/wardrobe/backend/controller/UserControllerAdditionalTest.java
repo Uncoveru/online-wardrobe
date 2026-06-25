@@ -39,6 +39,7 @@ class UserControllerAdditionalTest {
         user.setPhone("13900000001");
         user.setAddress("旧地址");
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         String result = mockMvc.perform(post("/api/user/login")

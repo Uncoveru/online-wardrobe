@@ -1,3 +1,4 @@
+<!-- 用户登录页 -->
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -33,6 +34,7 @@ async function handleLogin() {
     if (res.data.code === 200) {
       auth.setUser(res.data.data.user)
       ElMessage.success('登录成功')
+      // 登录后回到之前的页面
       const redirect = route.query.redirect as string | undefined
       router.push(redirect || '/')
     } else {

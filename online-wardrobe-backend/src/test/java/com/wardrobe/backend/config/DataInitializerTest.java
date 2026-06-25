@@ -47,6 +47,7 @@ class DataInitializerTest {
         admin.setUserName("existingadmin");
         admin.setPassword(passwordEncoder.encode("adminp1"));
         admin.setRole(1);
+        admin.setStatus(1);
         userMapper.insert(admin);
         assertEquals(1, userMapper.countByRole(1));
 

@@ -46,6 +46,7 @@ class PermissionControllerTest {
         operator.setUserName("opuser");
         operator.setPassword(passwordEncoder.encode("testp1"));
         operator.setRole(3);
+        operator.setStatus(1);
         userMapper.insert(operator);
 
         String opResult = mockMvc.perform(post("/api/user/login")
@@ -58,6 +59,7 @@ class PermissionControllerTest {
         regular.setUserName("reguser");
         regular.setPassword(passwordEncoder.encode("testp1"));
         regular.setRole(2);
+        regular.setStatus(1);
         userMapper.insert(regular);
 
         String regResult = mockMvc.perform(post("/api/user/login")

@@ -57,8 +57,8 @@ class UserControllerTest {
         mockMvc.perform(post("/api/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(json))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(500))
+                .andExpect(status().is(409))
+                .andExpect(jsonPath("$.code").value(409))
                 .andExpect(jsonPath("$.message").value("用户名已存在"));
     }
 
@@ -116,8 +116,8 @@ class UserControllerTest {
         mockMvc.perform(post("/api/user/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(loginJson))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.code").value(500));
+                .andExpect(status().is(401))
+                .andExpect(jsonPath("$.code").value(401));
     }
 
     @Test

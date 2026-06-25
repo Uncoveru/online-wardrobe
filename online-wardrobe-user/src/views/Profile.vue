@@ -1,3 +1,4 @@
+<!-- 个人中心：修改资料 + 修改密码 -->
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { ElMessage } from 'element-plus'
@@ -12,10 +13,12 @@ const passwordForm = reactive({ oldPassword: '', newPassword: '' })
 const profileLoading = ref(false)
 const passwordLoading = ref(false)
 
+// 更新个人资料
 async function handleUpdateProfile() {
   profileLoading.value = true
   try {
     await updateProfile(profileForm)
+    // 本地同步更新
     if (auth.user) {
       auth.user.phone = profileForm.phone
       auth.user.address = profileForm.address
@@ -28,6 +31,7 @@ async function handleUpdateProfile() {
   }
 }
 
+// 修改密码
 async function handleUpdatePassword() {
   if (!passwordForm.oldPassword || !passwordForm.newPassword) {
     ElMessage.warning('请输入密码')
@@ -52,6 +56,7 @@ async function handleUpdatePassword() {
     <header class="profile-header">
       <h1>个人中心</h1>
     </header>
+    <!-- 个人信息 -->
     <el-card style="margin-bottom:16px">
       <template #header>个人信息</template>
       <el-form label-width="80px">
@@ -69,6 +74,7 @@ async function handleUpdatePassword() {
         </el-form-item>
       </el-form>
     </el-card>
+    <!-- 修改密码 -->
     <el-card>
       <template #header>修改密码</template>
       <el-form label-width="80px">

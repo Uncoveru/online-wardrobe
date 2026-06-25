@@ -2,14 +2,18 @@ package com.wardrobe.backend.entity;
 
 import java.math.BigDecimal;
 
+/**
+ * 商品实体
+ */
 public class Clothes {
-    private Integer id;
-    private String clothName;
-    private String image;
-    private Integer typeId;
-    private String style;
-    private BigDecimal price;
-    private Integer operatorId;
+
+    private Integer id;           // 主键
+    private String clothName;     // 商品名称
+    private String image;         // 图片文件名
+    private Integer typeId;       // 类型 ID
+    private String style;         // 风格（休闲/商务/时尚等）
+    private BigDecimal price;     // 价格
+    private Integer operatorId;   // 添加该商品的操作员 ID
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }

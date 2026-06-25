@@ -1,3 +1,6 @@
+/**
+ * 路由配置：hash 模式 + 导航守卫（登录校验 + 用户管理权限）
+ */
 import { createRouter, createWebHashHistory } from 'vue-router'
 
 const router = createRouter({
@@ -47,6 +50,7 @@ const router = createRouter({
     ],
 })
 
+// 导航守卫：未登录 → /login；非超管访问 /users → /dashboard
 router.beforeEach((to, _from, next) => {
     const token = localStorage.getItem('token')
     if (to.meta.requiresAuth && !token) {

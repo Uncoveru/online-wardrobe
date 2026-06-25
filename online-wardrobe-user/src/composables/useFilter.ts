@@ -1,3 +1,6 @@
+/**
+ * 全局搜索关键词状态（跨组件共享）
+ */
 import { ref } from 'vue'
 
 const searchKeyword = ref('')

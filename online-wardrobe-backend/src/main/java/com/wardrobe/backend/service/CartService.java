@@ -22,6 +22,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 购物车服务：结算下单
+ */
 @Service
 public class CartService {
 
@@ -40,22 +43,27 @@ public class CartService {
         this.userMapper = userMapper;
     }
 
+    // 结算：根据购物车 ID 列表生成订单（事务）
     @Transactional
     public Order checkout(List<Integer> ids, Integer userId) {
+        // 加载选中的购物车条目
         List<Cart> items = ids.stream().map(cartMapper::findById).filter(c -> c != null).toList();
         if (items.isEmpty()) {
             throw new BusinessException(400, "未选择商品");
         }
 
+        // 校验归属权
         for (Cart item : items) {
             if (!item.getUserId().equals(userId)) {
                 throw new ForbiddenException("无权操作他人购物车");
             }
         }
 
+        // 获取用户地址
         User user = userMapper.findById(userId);
         String address = user != null && user.getAddress() != null ? user.getAddress() : "";
 
+        // 组装订单详情文本 + 计算总价 + 构建订单明细
         StringBuilder details = new StringBuilder();
         BigDecimal total = BigDecimal.ZERO;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -80,6 +88,7 @@ public class CartService {
             orderItems.add(oi);
         }
 
+        // 创建订单（状态：未支付）
         Order order = new Order();
         order.setClothesDetails(details.toString());
         order.setPrice(total);
@@ -89,6 +98,7 @@ public class CartService {
         order.setTime(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         orderMapper.insert(order);
 
+        // 批量插入订单明细
         for (OrderItem oi : orderItems) {
             oi.setOrderId(order.getId());
         }
@@ -96,6 +106,7 @@ public class CartService {
             orderItemMapper.insertBatch(orderItems);
         }
 
+        // 清空已结算的购物车条目
         cartMapper.deleteByIds(ids);
 
         return order;

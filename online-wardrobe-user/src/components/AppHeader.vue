@@ -1,3 +1,4 @@
+<!-- 顶部导航栏：搜索 + 用户菜单（响应式：桌面横向 / 移动侧边抽屉） -->
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -16,6 +17,7 @@ const mobileMenuOpen = ref(false)
 const isLoggedIn = computed(() => auth.isLoggedIn())
 const userName = computed(() => auth.user?.userName || '')
 
+// 搜索：设置关键词并跳转到首页
 function doSearch() {
   setSearch(searchKeyword.value)
   if (route.path !== '/') {
@@ -23,11 +25,13 @@ function doSearch() {
   }
 }
 
+// 退出登录
 function handleLogout() {
   auth.logout()
   router.push('/login')
 }
 
+// 导航跳转（同时关闭移动菜单）
 function navigateTo(path: string) {
   mobileMenuOpen.value = false
   router.push(path)
@@ -42,11 +46,13 @@ function navigateTo(path: string) {
         <router-link to="/" class="home-link">首页</router-link>
       </div>
 
+      <!-- 搜索栏 -->
       <div class="search-bar">
         <el-input v-model="searchKeyword" placeholder="搜索服装..." @keyup.enter="doSearch" />
         <el-button type="primary" @click="doSearch">搜索</el-button>
       </div>
 
+      <!-- 桌面端导航 -->
       <nav class="nav-links desktop-nav">
         <template v-if="!isLoggedIn">
           <el-button type="primary" link @click="navigateTo('/login')">登录</el-button>
@@ -61,11 +67,13 @@ function navigateTo(path: string) {
         </template>
       </nav>
 
+      <!-- 移动端菜单按钮 -->
       <el-button class="mobile-toggle" @click="mobileMenuOpen = true">
         <el-icon><Menu /></el-icon>
       </el-button>
     </div>
 
+    <!-- 移动端侧边抽屉 -->
     <el-drawer v-model="mobileMenuOpen" direction="rtl" size="260px" title="导航菜单">
       <div class="mobile-nav">
         <template v-if="!isLoggedIn">
@@ -168,6 +176,7 @@ function navigateTo(path: string) {
   padding: 8px 0;
 }
 
+/* 移动端适配 */
 @media (max-width: 768px) {
   .header-inner {
     display: flex;

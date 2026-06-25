@@ -44,6 +44,7 @@ class CartControllerTest {
         user.setUserName("carttestuser");
         user.setPassword(passwordEncoder.encode("testpw"));
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         String loginResult = mockMvc.perform(post("/api/user/login")

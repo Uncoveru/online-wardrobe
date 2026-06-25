@@ -1,3 +1,4 @@
+<!-- 首页：分类筛选 + 商品网格 + 响应式分页 -->
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
@@ -20,6 +21,7 @@ const mobileFilterOpen = ref(false)
 
 const currentPage = ref(1)
 
+// 响应式列数
 const columnsPerRow = ref(4)
 const ROWS_PER_PAGE = 3
 
@@ -33,10 +35,12 @@ function updateColumns() {
 
 const pageSize = computed(() => columnsPerRow.value * ROWS_PER_PAGE)
 
+// 列数变化时重置页码
 watch(pageSize, () => {
   currentPage.value = 1
 })
 
+// 前端分页
 const pagedClothes = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   return clothesList.value.slice(start, start + pageSize.value)
@@ -44,6 +48,7 @@ const pagedClothes = computed(() => {
 
 const total = computed(() => clothesList.value.length)
 
+// 同步筛选状态到 URL query
 function syncQuery() {
   const query: Record<string, string> = {}
   if (searchKeyword.value) query.keyword = searchKeyword.value
@@ -51,11 +56,12 @@ function syncQuery() {
   router.replace({ query })
 }
 
-// 搜索时清除分类筛选，确保做全局搜索
+// 搜索时清除分类筛选
 watch(searchKeyword, (val) => {
   if (val) activeTypeId.value = null
 })
 
+// 关键词或分类变化时重新加载
 watch([searchKeyword, activeTypeId], async () => {
   currentPage.value = 1
   await fetchClothes()
@@ -66,6 +72,7 @@ onMounted(async () => {
   updateColumns()
   window.addEventListener('resize', updateColumns)
 
+  // 从 URL 恢复筛选状态
   const qKeyword = (route.query.keyword as string) || ''
   const qTypeId = route.query.typeId ? Number(route.query.typeId) : null
   if (qKeyword) searchKeyword.value = qKeyword
@@ -77,6 +84,7 @@ onUnmounted(() => {
   window.removeEventListener('resize', updateColumns)
 })
 
+// 获取商品列表（有筛选条件时走搜索接口）
 async function fetchClothes() {
   loading.value = true
   error.value = false
@@ -98,6 +106,7 @@ async function fetchClothes() {
   }
 }
 
+// 获取商品类型
 async function fetchTypes() {
   try {
     const res = await getTypes()
@@ -105,10 +114,12 @@ async function fetchTypes() {
   } catch {}
 }
 
+// 跳转详情
 function viewDetail(id: number) {
   router.push(`/clothes/${id}`)
 }
 
+// 类型 ID → 名称
 function getTypeName(typeId: number) {
   return types.value.find((t) => t.id === typeId)?.typeName || ''
 }
@@ -119,6 +130,7 @@ function getTypeName(typeId: number) {
     <h2 class="section-title">本季新品</h2>
 
     <div class="home-body">
+      <!-- 桌面端左侧分类 -->
       <aside class="sidebar">
         <h3 class="filter-title">分类</h3>
         <ul class="filter-list">
@@ -132,6 +144,7 @@ function getTypeName(typeId: number) {
         </ul>
       </aside>
 
+      <!-- 移动端筛选按钮 -->
       <div class="mobile-filter-bar">
         <el-button @click="mobileFilterOpen = true">
           <el-icon><Operation /></el-icon> 筛选
@@ -139,6 +152,7 @@ function getTypeName(typeId: number) {
       </div>
 
       <div class="content">
+        <!-- 加载态 -->
         <div v-if="loading" class="skeleton-grid">
           <el-skeleton v-for="n in pageSize" :key="n" animated>
             <template #template>
@@ -152,17 +166,20 @@ function getTypeName(typeId: number) {
           </el-skeleton>
         </div>
 
+        <!-- 错误态 -->
         <el-result v-else-if="error" status="error" title="加载失败" sub-title="请检查网络后重试">
           <template #extra>
             <el-button type="primary" @click="fetchClothes">重试</el-button>
           </template>
         </el-result>
 
+        <!-- 空态 -->
         <div v-else-if="clothesList.length === 0" class="empty">
           <p>暂无服装</p>
           <el-button type="primary" link @click="router.push('/')">去看看其他商品</el-button>
         </div>
 
+        <!-- 商品网格 -->
         <template v-else>
           <div class="clothes-grid">
             <ProductCard
@@ -173,6 +190,7 @@ function getTypeName(typeId: number) {
               @click="viewDetail(item.id)"
             />
           </div>
+          <!-- 分页 -->
           <div class="pagination-wrap" v-if="total > pageSize">
             <el-pagination
               v-model:current-page="currentPage"
@@ -186,6 +204,7 @@ function getTypeName(typeId: number) {
       </div>
     </div>
 
+    <!-- 移动端筛选抽屉 -->
     <el-drawer v-model="mobileFilterOpen" direction="ltr" size="260px" title="筛选">
       <h3 class="filter-title">分类</h3>
       <ul class="filter-list">

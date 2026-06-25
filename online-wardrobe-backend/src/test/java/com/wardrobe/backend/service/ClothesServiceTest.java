@@ -82,7 +82,7 @@ class ClothesServiceTest {
 
         c.setClothName("更新名称");
         c.setPrice(new BigDecimal("150.00"));
-        clothesService.updateClothes(c, null);
+        clothesService.updateClothes(c, null, null);
 
         Clothes updated = clothesService.getClothesById(c.getId());
         assertEquals("更新名称", updated.getClothName());
@@ -98,7 +98,7 @@ class ClothesServiceTest {
         c.setPrice(new BigDecimal("50.00"));
         clothesService.addClothes(c, null, null);
 
-        clothesService.deleteClothes(c.getId());
+        clothesService.deleteClothes(c.getId(), null);
 
         Clothes found = clothesService.getClothesById(c.getId());
         assertNull(found);

@@ -1,3 +1,4 @@
+<!-- 商品详情页：图片 + 信息 + 尺码/数量选择 + 加入购物车 -->
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
@@ -26,6 +27,7 @@ onMounted(async () => {
     const res = await getClothesById(id)
     if (res.data.data) {
       clothes.value = res.data.data
+      // 加载该类型的可选尺码
       const sizesRes = await getSizes(clothes.value.typeId)
       sizes.value = sizesRes.data.data || []
     } else {
@@ -38,6 +40,7 @@ onMounted(async () => {
   }
 })
 
+// 加入购物车
 async function handleAddToCart() {
   if (!auth.isLoggedIn()) {
     ElMessage.warning('请先登录')
@@ -70,6 +73,7 @@ async function handleAddToCart() {
   <div class="detail">
     <router-link to="/" class="back-link">← 返回首页</router-link>
 
+    <!-- 加载态 -->
     <div v-if="loading">
       <el-skeleton animated>
         <template #template>
@@ -86,18 +90,21 @@ async function handleAddToCart() {
       </el-skeleton>
     </div>
 
+    <!-- 错误态 -->
     <el-result v-else-if="error" status="error" title="加载失败" sub-title="请检查网络后重试">
       <template #extra>
         <el-button type="primary" @click="router.go(0)">刷新</el-button>
       </template>
     </el-result>
 
+    <!-- 不存在 -->
     <el-result v-else-if="notFound" status="warning" title="商品不存在" sub-title="该商品可能已下架">
       <template #extra>
         <el-button type="primary" @click="router.push('/')">返回首页</el-button>
       </template>
     </el-result>
 
+    <!-- 商品详情内容 -->
     <div v-else-if="clothes" class="detail-body">
       <div class="image-section">
         <el-image
@@ -114,6 +121,7 @@ async function handleAddToCart() {
         <p class="style">风格：{{ clothes.style }}</p>
         <p class="price">¥{{ clothes.price }}</p>
 
+        <!-- 尺码选择 -->
         <div class="size-section">
           <label>尺码：</label>
           <el-radio-group v-model="selectedSize">
@@ -121,6 +129,7 @@ async function handleAddToCart() {
           </el-radio-group>
         </div>
 
+        <!-- 数量 -->
         <div class="quantity-section">
           <label>数量：</label>
           <el-input-number v-model="quantity" :min="1" :max="99" />

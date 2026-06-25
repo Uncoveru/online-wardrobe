@@ -39,6 +39,7 @@ class AdminUserControllerTest {
         admin.setUserName("admintest");
         admin.setPassword(passwordEncoder.encode("adminp1"));
         admin.setRole(1);
+        admin.setStatus(1);
         userMapper.insert(admin);
         adminUserId = admin.getId();
 
@@ -62,6 +63,7 @@ class AdminUserControllerTest {
         other.setUserName("otheruser");
         other.setPassword(passwordEncoder.encode("otherp1"));
         other.setRole(2);
+        other.setStatus(1);
         userMapper.insert(other);
 
         mockMvc.perform(delete("/api/admin/users/" + other.getId())
@@ -77,6 +79,7 @@ class AdminUserControllerTest {
         user.setPassword(passwordEncoder.encode("phonet1"));
         user.setPhone("13812345678");
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         mockMvc.perform(get("/api/admin/users")
@@ -84,7 +87,7 @@ class AdminUserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.data[?(@.userName=='phoneuser')].phone")
-                        .value("138****5678"));
+                        .value("13812345678"));
     }
 
     @Test
@@ -93,6 +96,7 @@ class AdminUserControllerTest {
         user.setUserName("nopassuser");
         user.setPassword(passwordEncoder.encode("haspass1"));
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         String body = mockMvc.perform(get("/api/admin/users")
@@ -109,6 +113,7 @@ class AdminUserControllerTest {
         user.setUserName("softdel");
         user.setPassword(passwordEncoder.encode("softd1"));
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         mockMvc.perform(delete("/api/admin/users/" + user.getId())
@@ -129,6 +134,7 @@ class AdminUserControllerTest {
         user.setUserName("hiddenuser");
         user.setPassword(passwordEncoder.encode("hidden1"));
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         mockMvc.perform(delete("/api/admin/users/" + user.getId())

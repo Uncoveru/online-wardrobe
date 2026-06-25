@@ -38,6 +38,7 @@ class ClothesControllerTest {
         user.setUserName("clothesadmin");
         user.setPassword(passwordEncoder.encode("adminp1"));
         user.setRole(1);
+        user.setStatus(1);
         userMapper.insert(user);
 
         String result = mockMvc.perform(post("/api/user/login")
@@ -154,6 +155,6 @@ class ClothesControllerTest {
         mockMvc.perform(get("/api/sizes").param("typeId", "1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value(200))
-                .andExpect(jsonPath("$.data.length()").value(4));
+                .andExpect(jsonPath("$.data.length()").value(6));
     }
 }

@@ -1,3 +1,4 @@
+<!-- 我的订单：列表 + 支付 + 确认收货 + 分页 -->
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -14,6 +15,7 @@ const loading = ref(false)
 const currentPage = ref(1)
 const pageSize = 10
 
+// 前端分页
 const pagedOrders = computed(() => {
   const start = (currentPage.value - 1) * pageSize
   return orders.value.slice(start, start + pageSize)
@@ -25,6 +27,7 @@ onMounted(async () => {
   await fetchOrders()
 })
 
+// 获取订单列表
 async function fetchOrders() {
   loading.value = true
   try {
@@ -37,6 +40,7 @@ async function fetchOrders() {
   }
 }
 
+// 支付（二次确认 + 乐观更新状态）
 async function handlePay(order: OrderInfo) {
   try {
     await ElMessageBox.confirm(`确认支付订单 #${order.id}，金额 ¥${order.price}？`, '确认支付', { type: 'warning' })
@@ -52,6 +56,7 @@ async function handlePay(order: OrderInfo) {
   }
 }
 
+// 确认收货（二次确认 + 乐观更新状态）
 async function handleConfirm(order: OrderInfo) {
   try {
     await ElMessageBox.confirm('确认已收到商品？', '确认收货', { type: 'warning' })
@@ -74,10 +79,12 @@ async function handleConfirm(order: OrderInfo) {
       <h1>我的订单</h1>
     </header>
 
+    <!-- 加载态 -->
     <el-card v-if="loading && orders.length === 0">
       <el-skeleton :rows="4" animated />
     </el-card>
 
+    <!-- 空态 -->
     <el-card v-else-if="orders.length === 0">
       <div style="text-align:center;padding:40px;color:#999">
         <p>暂无订单</p>
@@ -85,6 +92,7 @@ async function handleConfirm(order: OrderInfo) {
       </div>
     </el-card>
 
+    <!-- 订单列表 -->
     <template v-else>
       <TransitionGroup name="order-list" tag="div">
         <OrderCard

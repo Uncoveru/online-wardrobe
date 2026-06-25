@@ -1,3 +1,4 @@
+<!-- 用户注册页（注册成功后自动登录） -->
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -14,6 +15,7 @@ const formRef = ref<FormInstance>()
 const form = reactive({ userName: '', password: '', confirmPassword: '', phone: '', address: '' })
 const loading = ref(false)
 
+// 确认密码校验
 const validateConfirmPassword = (_rule: any, value: string, callback: (error?: Error) => void) => {
   if (!value) {
     callback(new Error('请再次输入密码'))
@@ -24,6 +26,7 @@ const validateConfirmPassword = (_rule: any, value: string, callback: (error?: E
   }
 }
 
+// 手机号校验
 const validatePhone = (_rule: any, value: string, callback: (error?: Error) => void) => {
   if (value && !/^\d{11}$/.test(value)) {
     callback(new Error('手机号格式不正确'))
@@ -45,6 +48,7 @@ const rules: FormRules = {
   phone: [{ validator: validatePhone, trigger: 'blur' }],
 }
 
+// 注册 → 自动登录 → 跳转首页
 async function handleRegister() {
   const valid = await formRef.value?.validate().catch(() => false)
   if (!valid) return

@@ -1,3 +1,4 @@
+<!-- 管理员登录页 -->
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -16,11 +17,13 @@ const form = reactive({
     password: '',
 })
 
+// 表单校验规则
 const rules = {
     account: [{ required: true, message: '请输入用户名或手机号', trigger: 'blur' }],
     password: [{ required: true, message: '请输入密码', trigger: 'blur' }],
 }
 
+// 登录
 async function handleLogin() {
     const valid = await formRef.value?.validate().catch(() => false)
     if (!valid) return

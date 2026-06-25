@@ -3,15 +3,19 @@ package com.wardrobe.backend.entity;
 import java.math.BigDecimal;
 import java.util.List;
 
+/**
+ * 订单实体（一对多关联 OrderItem）
+ */
 public class Order {
-    private Integer id;
-    private String clothesDetails;
-    private BigDecimal price;
-    private String status;
-    private Integer userId;
-    private String address;
-    private String time;
-    private List<OrderItem> orderItems;
+
+    private Integer id;               // 主键
+    private String clothesDetails;    // 商品详情文本（冗余字段，方便前端展示）
+    private BigDecimal price;         // 订单总价
+    private String status;            // 状态码（0=未支付, 1=未发货, 2=已发货, 3=已收货）
+    private Integer userId;           // 下单用户 ID
+    private String address;           // 收货地址
+    private String time;              // 下单时间
+    private List<OrderItem> orderItems; // 订单明细
 
     public Integer getId() { return id; }
     public void setId(Integer id) { this.id = id; }

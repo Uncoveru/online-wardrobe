@@ -1,7 +1,8 @@
+<!-- 订单管理：搜索 / 列表 / 发货 + 分页 -->
 <script setup lang="ts">
 import { reactive, ref, onMounted, computed } from 'vue'
 import { ElMessage } from 'element-plus'
-import { getOrders, shipOrder, type OrderInfo, type OrderItem } from '../api'
+import { getOrders, shipOrder, type OrderInfo } from '../api'
 import { ORDER_STATUS, ORDER_STATUS_LABELS } from '../constants/order'
 
 const orders = ref<OrderInfo[]>([])
@@ -10,16 +11,19 @@ const loading = ref(false)
 const currentPage = ref(1)
 const pageSize = 10
 
+// 前端分页
 const pagedData = computed(() => {
     const start = (currentPage.value - 1) * pageSize
     return orders.value.slice(start, start + pageSize)
 })
 
+// 搜索表单
 const searchForm = reactive({
     userName: '',
     status: '',
 })
 
+// 状态 → Element Tag 类型映射
 function getStatusType(status: string) {
     const map: Record<string, string> = {
         '0': 'danger',
@@ -34,6 +38,7 @@ onMounted(() => {
     fetchOrders()
 })
 
+// 获取订单列表
 async function fetchOrders() {
     loading.value = true
     try {
@@ -44,6 +49,7 @@ async function fetchOrders() {
     }
 }
 
+// 搜索
 async function handleSearch() {
     currentPage.value = 1
     loading.value = true
@@ -58,6 +64,7 @@ async function handleSearch() {
     }
 }
 
+// 重置
 function handleReset() {
     searchForm.userName = ''
     searchForm.status = ''
@@ -65,6 +72,7 @@ function handleReset() {
     fetchOrders()
 }
 
+// 发货
 async function handleShip(row: OrderInfo) {
     try {
         await shipOrder(row.id)
@@ -78,6 +86,7 @@ async function handleShip(row: OrderInfo) {
 </script>
 
 <template>
+    <!-- 搜索栏 -->
     <el-card>
         <el-form :inline="true" :model="searchForm" @submit.prevent="handleSearch">
             <el-form-item label="下单用户">
@@ -98,6 +107,7 @@ async function handleShip(row: OrderInfo) {
         </el-form>
     </el-card>
 
+    <!-- 订单表格 -->
     <el-card style="margin-top:16px">
         <el-table :data="pagedData" v-loading="loading" border stripe>
             <template #empty>
@@ -106,6 +116,7 @@ async function handleShip(row: OrderInfo) {
             <el-table-column prop="id" label="编号" width="80" />
             <el-table-column label="商品详情" min-width="200">
                 <template #default="{ row }">
+                    <!-- orderItems 有数据则展示明细，否则展示冗余文本 -->
                     <template v-if="row.orderItems && row.orderItems.length > 0">
                         <div v-for="item in row.orderItems" :key="item.id" class="order-item-detail">
                             {{ item.clothName }}{{ item.clothSize === '均码' ? '' : '码' }} ×{{ item.amount }} ¥{{ item.price }}
@@ -130,6 +141,7 @@ async function handleShip(row: OrderInfo) {
             <el-table-column prop="time" label="下单时间" width="170" />
             <el-table-column label="操作" width="100" fixed="right">
                 <template #default="{ row }">
+                    <!-- 仅未发货状态可操作 -->
                     <el-popconfirm v-if="row.status === ORDER_STATUS.PAID" title="确定发货吗？" @confirm="handleShip(row)">
                         <template #reference>
                             <el-button type="primary" size="small">发货</el-button>

@@ -1,3 +1,6 @@
+/**
+ * 路由配置：history 模式 + 导航守卫（需登录页面的跳转）
+ */
 import { createRouter, createWebHistory } from 'vue-router'
 import AppLayout from '../components/AppLayout.vue'
 
@@ -56,6 +59,7 @@ const router = createRouter({
     ],
 })
 
+// 导航守卫：需要登录的页面未登录则跳转 /login，并携带 redirect 参数
 router.beforeEach((to, _from, next) => {
     const token = localStorage.getItem('token')
     if (to.meta.requiresAuth && !token) {

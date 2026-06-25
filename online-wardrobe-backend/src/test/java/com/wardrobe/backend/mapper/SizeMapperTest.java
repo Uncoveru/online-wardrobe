@@ -21,7 +21,7 @@ class SizeMapperTest {
     void shouldFindSizesByTypeId() {
         List<Size> sizes = sizeMapper.findByTypeId(1);
         assertNotNull(sizes);
-        assertEquals(4, sizes.size());
+        assertEquals(6, sizes.size());
         assertEquals("S", sizes.get(0).getSizeName());
     }
 

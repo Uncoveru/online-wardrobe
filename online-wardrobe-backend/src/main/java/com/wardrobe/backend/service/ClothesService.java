@@ -20,11 +20,15 @@ import org.slf4j.LoggerFactory;
 import com.wardrobe.backend.exception.BusinessException;
 import com.wardrobe.backend.exception.ForbiddenException;
 
+/**
+ * 商品服务：CRUD + 图片上传
+ */
 @Service
 public class ClothesService {
 
     private static final Logger log = LoggerFactory.getLogger(ClothesService.class);
 
+    // 允许的图片扩展名
     private static final Set<String> ALLOWED_EXTENSIONS = Set.of(
         ".jpg", ".jpeg", ".png", ".gif", ".webp"
     );
@@ -37,18 +41,22 @@ public class ClothesService {
         this.uploadPath = Paths.get(uploadDir);
     }
 
+    // 商品列表（operationId 不为空时只查该操作员的商品）
     public List<Clothes> getClothesList(Integer operatorId) {
         return clothesMapper.findAll(operatorId);
     }
 
+    // 多条件搜索
     public List<Clothes> getClothesByParams(String clothName, String style, Integer typeId, Integer operatorId) {
         return clothesMapper.findByParams(clothName, style, typeId, operatorId);
     }
 
+    // 商品详情
     public Clothes getClothesById(Integer id) {
         return clothesMapper.findById(id);
     }
 
+    // 新增商品（含图片上传）
     public Clothes addClothes(Clothes clothes, MultipartFile file, Integer operatorId) {
         if (file != null && !file.isEmpty()) {
             String filename = saveFile(file);
@@ -59,6 +67,7 @@ public class ClothesService {
         return clothes;
     }
 
+    // 更新商品（含图片替换，操作员只能改自己的商品）
     public Clothes updateClothes(Clothes clothes, MultipartFile file, Integer operatorId) {
         Clothes existing = clothesMapper.findById(clothes.getId());
         if (existing == null) {
@@ -80,6 +89,7 @@ public class ClothesService {
 
         clothesMapper.update(clothes);
 
+        // 替换图片后删除旧文件
         if (file != null && !file.isEmpty() && oldImage != null) {
             try {
                 Files.deleteIfExists(uploadPath.resolve(oldImage));
@@ -91,6 +101,7 @@ public class ClothesService {
         return clothes;
     }
 
+    // 删除商品（同时删除图片文件，操作员只能删自己的商品）
     public void deleteClothes(Integer id, Integer operatorId) {
         Clothes clothes = clothesMapper.findById(id);
         if (clothes == null) {
@@ -112,6 +123,7 @@ public class ClothesService {
         }
     }
 
+    // 保存上传文件到磁盘，返回随机文件名
     private String saveFile(MultipartFile file) {
         String contentType = file.getContentType();
         if (contentType != null && !List.of("image/jpeg", "image/png", "image/gif", "image/webp")

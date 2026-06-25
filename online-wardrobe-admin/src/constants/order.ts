@@ -1,9 +1,11 @@
-/** 与 online-wardrobe-user/src/constants/order.ts 保持同步 */
+/**
+ * 订单状态常量（需与后端枚举保持一致）
+ */
 export const ORDER_STATUS = {
-  UNPAID: '0',
-  PAID: '1',
-  SHIPPED: '2',
-  RECEIVED: '3',
+  UNPAID: '0',    // 未支付
+  PAID: '1',      // 未发货
+  SHIPPED: '2',   // 已发货
+  RECEIVED: '3',  // 已收货
 } as const
 
 export const ORDER_STATUS_LABELS: Record<string, string> = {

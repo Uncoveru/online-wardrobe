@@ -21,6 +21,9 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * 启动时初始化示例商品数据，并为每件商品自动生成占位图片
+ */
 @Component
 @Order(2)
 public class ClothesDataInitializer implements CommandLineRunner {
@@ -30,6 +33,7 @@ public class ClothesDataInitializer implements CommandLineRunner {
     private final ClothesMapper clothesMapper;
     private final Path uploadPath;
 
+    // 生成图片尺寸
     private static final int IMG_WIDTH = 600;
     private static final int IMG_HEIGHT = 800;
 
@@ -39,6 +43,7 @@ public class ClothesDataInitializer implements CommandLineRunner {
         this.uploadPath = Paths.get(uploadDir);
     }
 
+    // 启动后检查：若商品表为空则插入 10 件示例商品并生成对应图片
     @Override
     public void run(String... args) {
         List<Clothes> existing = clothesMapper.findAll(null);
@@ -85,6 +90,7 @@ public class ClothesDataInitializer implements CommandLineRunner {
         log.info("已创建 {} 件示例商品", count);
     }
 
+    // 生成带商品名称首字和文字标题的纯色占位图
     private String generateImage(String name, int typeId) throws IOException {
         BufferedImage image = new BufferedImage(IMG_WIDTH, IMG_HEIGHT, BufferedImage.TYPE_INT_RGB);
         Graphics2D g = image.createGraphics();
@@ -101,6 +107,7 @@ public class ClothesDataInitializer implements CommandLineRunner {
         g.setColor(bgColor.brighter());
         g.fillOval(IMG_WIDTH / 2 - circleR, circleY - circleR, circleR * 2, circleR * 2);
 
+        // 顶部圆形区域绘制商品名称首字
         String symbol = name.substring(0, 1);
         g.setColor(Color.WHITE);
         g.setFont(new Font("SansSerif", Font.PLAIN, 64));
@@ -109,6 +116,7 @@ public class ClothesDataInitializer implements CommandLineRunner {
         int symbolY = circleY - circleR / 2 + symbolFm.getAscent() / 2;
         g.drawString(symbol, symbolX, symbolY);
 
+        // 中间区域绘制完整商品名称（过长的文字自动换行）
         g.setColor(Color.WHITE);
         g.setFont(new Font("SansSerif", Font.BOLD, 42));
         FontMetrics fm = g.getFontMetrics();
@@ -132,6 +140,7 @@ public class ClothesDataInitializer implements CommandLineRunner {
         return filename;
     }
 
+    // 文字超过 6 个字符时从中间换行
     private String[] splitText(String text) {
         if (text.length() <= 6) {
             return new String[] { text };
@@ -140,12 +149,13 @@ public class ClothesDataInitializer implements CommandLineRunner {
         return new String[] { text.substring(0, mid), text.substring(mid) };
     }
 
+    // 根据类型 ID 返回不同背景色
     private Color getBgColor(int typeId) {
         return switch (typeId) {
-            case 1 -> new Color(74, 144, 217);
-            case 2 -> new Color(139, 105, 20);
-            case 3 -> new Color(232, 145, 176);
-            case 4 -> new Color(51, 51, 51);
+            case 1 -> new Color(74, 144, 217);   // 上衣：蓝色
+            case 2 -> new Color(139, 105, 20);   // 裤子：棕色
+            case 3 -> new Color(232, 145, 176);  // 裙子：粉色
+            case 4 -> new Color(51, 51, 51);     // 鞋子：深灰
             default -> new Color(128, 128, 128);
         };
     }

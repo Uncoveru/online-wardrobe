@@ -8,6 +8,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+/**
+ * 管理员登录接口
+ */
 @RestController
 @RequestMapping("/api/admin")
 public class AdminAuthController {
@@ -20,6 +23,7 @@ public class AdminAuthController {
         this.jwtUtils = jwtUtils;
     }
 
+    // 管理员登录，返回用户信息 + JWT Token
     @PostMapping("/login")
     public Result<Map<String, Object>> login(@RequestBody Map<String, String> params) {
         String account = params.get("account");

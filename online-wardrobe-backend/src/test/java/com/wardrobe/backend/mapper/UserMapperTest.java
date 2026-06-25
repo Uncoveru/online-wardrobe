@@ -23,6 +23,7 @@ class UserMapperTest {
         user.setPhone("13900000000");
         user.setAddress("测试地址");
         user.setRole(2);
+        user.setStatus(1);
 
         userMapper.insert(user);
 
@@ -35,6 +36,7 @@ class UserMapperTest {
         user.setUserName("findbyuser");
         user.setPassword("123456");
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         User found = userMapper.findByUserName("findbyuser");
@@ -50,6 +52,7 @@ class UserMapperTest {
         user.setPassword("123456");
         user.setPhone("13800001111");
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         User found = userMapper.findByPhone("13800001111");
@@ -64,6 +67,7 @@ class UserMapperTest {
         user.setUserName("iduser");
         user.setPassword("123456");
         user.setRole(2);
+        user.setStatus(1);
         userMapper.insert(user);
 
         User found = userMapper.findById(user.getId());

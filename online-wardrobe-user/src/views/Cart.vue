@@ -1,3 +1,4 @@
+<!-- 购物车：多选 + 改数量 + 删除 + 结算 -->
 <script setup lang="ts">
 import { ref, computed, nextTick, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
@@ -14,28 +15,31 @@ const tableRef = ref<TableInstance>()
 
 onMounted(() => fetchCart())
 
+// 刷新购物车列表（保留已选中的有效条目）
 async function fetchCart() {
   try {
     const res = await getCart()
     const savedIds = [...checkedIds.value]
     cartItems.value = res.data.data || []
     await nextTick()
-    // Re-apply selections that still exist after refresh
+    // 恢复仍然存在的勾选
     cartItems.value.forEach((item) => {
       if (savedIds.includes(item.id)) {
         tableRef.value?.toggleRowSelection(item, true)
       }
     })
-    // Remove any stale IDs (items that no longer exist in cart)
+    // 清除不存在的旧 ID
     const currentIds = new Set(cartItems.value.map((i) => i.id))
     checkedIds.value = checkedIds.value.filter((id) => currentIds.has(id))
   } catch {}
 }
 
+// 表格选择变化
 function handleSelectionChange(rows: CartInfo[]) {
   checkedIds.value = rows.map((r) => r.id)
 }
 
+// 全选计算属性
 const allChecked = computed({
   get: () => cartItems.value.length > 0 && checkedIds.value.length === cartItems.value.length,
   set: (val: boolean) => {
@@ -47,16 +51,19 @@ const allChecked = computed({
   },
 })
 
+// 已选商品总价
 const totalPrice = computed(() =>
   cartItems.value
     .filter((i) => checkedIds.value.includes(i.id))
     .reduce((sum, i) => sum + (i.price || 0) * i.amount, 0),
 )
 
+// 单行小计
 function subtotal(item: CartInfo) {
   return (item.price || 0) * item.amount
 }
 
+// 修改数量（失败时回滚）
 async function handleAmountChange(item: CartInfo, amount: number) {
   if (amount < 1) return
   const previousAmount = item.amount
@@ -69,6 +76,7 @@ async function handleAmountChange(item: CartInfo, amount: number) {
   }
 }
 
+// 删除条目
 async function handleDelete(item: CartInfo) {
   await deleteCartItem(item.id)
   ElMessage.success('已删除')
@@ -76,6 +84,7 @@ async function handleDelete(item: CartInfo) {
   fetchCart()
 }
 
+// 结算下单
 async function handleCheckout() {
   if (checkedIds.value.length === 0) {
     ElMessage.warning('请选择结算商品')
@@ -111,6 +120,7 @@ async function handleCheckout() {
       <el-button link @click="router.push('/')">继续购物</el-button>
     </header>
 
+    <!-- 空购物车 -->
     <el-card v-if="cartItems.length === 0">
       <div class="empty-cart">
         <p>购物车是空的</p>
@@ -121,6 +131,7 @@ async function handleCheckout() {
     <template v-else>
       <el-card>
         <el-table ref="tableRef" :data="cartItems" class="cart-table" @selection-change="handleSelectionChange">
+          <!-- 下架商品不可选 -->
           <el-table-column type="selection" width="50" :selectable="(row: CartInfo) => !!row.clothName" />
           <el-table-column label="商品" min-width="180">
             <template #default="{ row }">
@@ -156,6 +167,7 @@ async function handleCheckout() {
         </el-table>
       </el-card>
 
+      <!-- 底部结算栏 -->
       <div class="cart-footer">
         <el-checkbox v-model="allChecked">全选</el-checkbox>
         <div class="cart-summary">

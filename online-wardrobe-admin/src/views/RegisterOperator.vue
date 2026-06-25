@@ -1,3 +1,4 @@
+<!-- 运营人员注册申请页（提交后需超管审核） -->
 <script setup lang="ts">
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
@@ -17,6 +18,7 @@ const form = reactive({
     address: '',
 })
 
+// 密码校验：至少6位 + 字母 + 数字
 const validatePassword = (_rule: any, value: string, callback: any) => {
     if (!value) {
         callback(new Error('请输入密码'))
@@ -33,6 +35,7 @@ const validatePassword = (_rule: any, value: string, callback: any) => {
     callback()
 }
 
+// 确认密码校验
 const validateConfirmPassword = (_rule: any, value: string, callback: any) => {
     if (!value) {
         callback(new Error('请确认密码'))
@@ -45,6 +48,7 @@ const validateConfirmPassword = (_rule: any, value: string, callback: any) => {
     callback()
 }
 
+// 手机号校验
 const validatePhone = (_rule: any, value: string, callback: any) => {
     if (!value) {
         callback(new Error('请输入手机号'))
@@ -65,6 +69,7 @@ const rules = {
     address: [{ required: true, message: '请输入地址', trigger: 'blur' }],
 }
 
+// 提交注册申请
 async function handleRegister() {
     const valid = await formRef.value?.validate().catch(() => false)
     if (!valid) return
